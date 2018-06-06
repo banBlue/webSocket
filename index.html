@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./node_modules/socket.io-client/dist/socket.io.js"></script>
+    <script src="./node_modules/jquery/dist/jquery.js"></script>
+    <style>
+        .blue{
+            color:aqua;
+        }
+        .y{
+            color:yellow
+        }
+    </style>
+</head>
+<body>
+    <div id="m"></div>
+    <input type="text" id="name">
+    <br>
+    <input type="text" id="password">
+    <br>
+    <input type="button" value="注册" id="reg">
+    <input type="button" value="登录" id="login">
+    <br>
+    <input type="text" id="speed">
+    <input type="button" value="发言" id="speedBtn">
+    <br>
+    <input type="text" id="man"> 目前在线人数
+    <ul id="list">
+
+    </ul>
+    <script>
+        const socket = io('ws://localhost:8000');
+
+        //注册
+        socket.on("reg_ret",function(data){
+            console.log(data)
+        })
+
+        //登录
+        socket.on("login_ret",function(data){
+            console.log(data)
+            $("#m").html(data.userName)
+        })
+
+        //统计在线人数
+        socket.on('man',function(data){
+            $("#man").val(data)
+        })
+
+        $("#reg").click(function(){
+            socket.emit('reg', {password:$('#password').val(),name:$("#name").val()});     
+        })
+
+        $("#login").click(function(){
+            socket.emit('login', {password:$('#password').val(),name:$("#name").val()});     
+        })
+
+        $("#speedBtn").click(function(){
+            socket.emit('content', $("#speed").val());
+        })
+
+        socket.on('content_ret',(data)=>{
+            console.log(data.msg)
+            $("#list").append(`<li class="blue">${data}</li>`)
+        })
+
+        socket.on('server message',(data)=>{
+            console.log(data)
+            $("#list").append(`<li class="y">${data.msg}</li>`)
+        })
+    </script>
+</body>
+</html>
